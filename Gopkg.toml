@@ -1,0 +1,8 @@
+required = [
+    'github.com/mmatczuk/go_generics/cmd/go_generics',
+    'github.com/mmatczuk/go_generics/cmd/go_merge'
+]
+
+[prune]
+  go-tests = true
+  unused-packages = true
