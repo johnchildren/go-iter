@@ -1,9 +1,54 @@
 package iiterator
 
-type Iterator interface {
+type minimalIterator interface {
 	Next() Maybe
-	Count() int
-	Last() int
+}
+
+type Iterator struct {
+	minimalIterator
+}
+
+func (it *Iterator) Count() int {
+	count := 0
+	for {
+		switch it.Next().(type) {
+		case Just:
+			count++
+		case None:
+			return count
+		}
+	}
+}
+
+func (it *Iterator) Last() Maybe {
+	var last Maybe = None{}
+	for {
+		switch mt := it.Next().(type) {
+		case Just:
+			last = mt
+		case None:
+			return last
+		}
+	}
+}
+
+func (it *Iterator) Nth(n int) Maybe {
+	var nth Maybe = None{}
+	for v := 0; v <= n; v++ {
+		nth = it.Next()
+	}
+	return nth
+}
+
+func (it *Iterator) ForEach(f func(x int)) {
+	for {
+		switch mt := it.Next().(type) {
+		case Just:
+			f(mt.Value)
+		case None:
+			return
+		}
+	}
 }
 
 type sliceIterator struct {
@@ -21,18 +66,12 @@ func (s *sliceIterator) Next() Maybe {
 	return Just{next}
 }
 
-func (s *sliceIterator) Count() int {
-	return s.len
-}
-
-func (s *sliceIterator) Last() int {
-	return s.slice[s.len-1]
-}
-
-func FromSlice(s []int) Iterator {
-	return &sliceIterator{
-		idx:   0,
-		len:   len(s),
-		slice: s,
+func FromSlice(s []int) *Iterator {
+	return &Iterator{
+		minimalIterator: &sliceIterator{
+			idx:   0,
+			len:   len(s),
+			slice: s,
+		},
 	}
 }

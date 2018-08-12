@@ -5,7 +5,7 @@ type Maybe interface {
 }
 
 type Just struct {
-	T int
+	Value int
 }
 
 func (Just) isMaybe() {}
